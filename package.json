@@ -13,6 +13,9 @@
         "wdio-chromedriver-service": "^7.2.2"
     },
     "scripts": {
-        "test": "wdio wdio.conf.js"
+        "test": "wdio wdio.conf.js",
+        "report": "allure serve",
+        "repl": "wdio repl chrome",
+        "clean": "rm -rf allure-results/*"
     }
 }
