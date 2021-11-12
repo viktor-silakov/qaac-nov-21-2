@@ -4,7 +4,17 @@
 `npm install`
 
 ### Run tests
+all tests:
+
 `npm test`
+
+specific file:
+
+`npx wdio wdio.conf.js --spec <path to file>`
+
+for example:
+
+`npx wdio wdio.conf.js --spec specs/message-service.js`
 
 ### Generate allure
 `npm run report`
