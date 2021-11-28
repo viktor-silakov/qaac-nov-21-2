@@ -30,17 +30,9 @@ describe("Check app", function () {
     })
 
     it('soft assert', async function () {
-        softAssert(() => {
-            assertEqual('c', 'a');
-        })
-
-        softAssert(() => {
-            assertEqual('a', 'b');
-        })
-
-        softAssert(() => {
-            assertEqual('a', 'a');
-        })
+        softAssert(() => assertEqual('c', 'a'))
+        softAssert(() => assertEqual('b', 'a'))
+        softAssert(() => assertEqual('a', 'a'))
 
         assertAll(softAssertsErrors);
     });
