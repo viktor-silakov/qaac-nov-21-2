@@ -5,7 +5,6 @@ describe('Check app', function () {
         await $('#login').setValue('walker@jw.com');
         await $('#password').setValue('password');
         await $('button').click();
-        await $('#spinner').waitForDisplayed({ reverse: false, timeout: 5000 });
         await browser.pause(15000);
         const title = await browser.getTitle();
         if (title !== 'Report portal') {

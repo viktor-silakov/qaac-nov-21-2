@@ -10,6 +10,7 @@ exports.config = {
     capabilities: [{
         maxInstances: 5,
         browserName: 'chrome',
+        pageLoadStrategy: 'eager',
         acceptInsecureCerts: true
     }],
     // Level of logging verbosity: trace | debug | info | warn | error | silent
@@ -22,6 +23,28 @@ exports.config = {
     services: ['chromedriver'],
 
     framework: 'mocha',
+    cucumberOpts: {
+        scenarioLevelReporter: true,
+        retry: process.env.RETRY || 0,
+        backtrace: true,
+        // requireModule: ['@babel/register'],
+        failAmbiguousDefinitions: true,
+        failFast: false,
+        ignoreUndefinedDefinitions: false,
+        name: [],
+        snippets: true,
+        source: true,
+        profile: [],
+        require: [
+            './features/step_definitions/**/*.js',
+        ],
+        snippetSyntax: undefined,
+        strict: true,
+        tagExpression: 'not @Pending',
+        tagsInTitle: false,
+        timeout: process.env.DBG === '1' ? 600000 : 180000,
+    },
+
     //
     // The number of times to retry the entire specfile when it fails as a whole
     // specFileRetries: 1,
@@ -133,6 +156,10 @@ exports.config = {
         if (!passed) {
             await browser.takeScreenshot();
         }
+    },
+
+    afterScenario: async ()=>{
+        await browser.reloadSession();
     },
 
     /**

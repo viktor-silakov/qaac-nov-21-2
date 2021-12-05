@@ -17,5 +17,9 @@
         "report": "allure serve",
         "repl": "wdio repl chrome",
         "clean": "rm -rf allure-results/*"
+    },
+    "dependencies": {
+        "@wdio/cucumber-framework": "^7.16.6",
+        "yaml": "^1.10.2"
     }
 }
