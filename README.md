@@ -1,4 +1,4 @@
-## Home Tasks Kit, lecture-2
+## Home Tasks Students Kit
 
 ### Install
 `npm install`
