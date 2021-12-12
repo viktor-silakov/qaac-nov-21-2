@@ -20,6 +20,7 @@ describe('Login', function () {
         { login: 'admin', password: '', msg: 'Password is empty' },
         { login: '', password: '', msg: 'Login is empty' },
     ]
+
     for (const user of testData) {
         it(`should not be logged in: '${user.login}', '${user.password}'`, async function () {
             await login(user.login, user.password);

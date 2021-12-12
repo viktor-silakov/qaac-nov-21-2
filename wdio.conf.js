@@ -1,4 +1,70 @@
+const {
+    addStep,
+    addFeature,
+    addAttachment,
+    addIssue,
+    addArgument,
+    addDescription,
+    addEnvironment,
+} = require('@wdio/allure-reporter').default;
+// const maxInstances = 1;
+// const build = 'test build';
+// const bsLocal = false;
+// const idleTimeout = 180000;
+const bsCaps = [
+    {
+        'bstack:options': {
+            "os": "Windows",
+            "osVersion": "10",
+            "local": "false",
+            "seleniumVersion": "3.5.2",
+            "userName": process.env.USER,
+            "accessKey": process.env.KEY,
+        },
+        "browserName": "Edge",
+        "browserVersion": "latest-beta",
+    },
+    {
+        'bstack:options': {
+            "os": "Windows",
+            "osVersion": "10",
+            "local": "false",
+            "seleniumVersion": "3.5.2",
+            "userName": process.env.USER,
+            "accessKey": process.env.KEY,
+        },
+        "browserName": "Firefox",
+        "browserVersion": "latest-beta",
+    },
+    {
+        'bstack:options': {
+            "os": "OS X",
+            "osVersion": "Monterey",
+            "local": "false",
+            "seleniumVersion": "3.14.0",
+            "userName": process.env.USER,
+            "accessKey": process.env.KEY,
+        },
+        "browserName": "Safari",
+        "browserVersion": "15.0",
+    }
+];
+
+const localCaps = [{
+    maxInstances: 5,
+    browserName: 'chrome',
+    pageLoadStrategy: 'eager',
+    acceptInsecureCerts: true,
+    'goog:chromeOptions': {
+        args: process.env.HL === '1' ? ['--headless'] : [],
+    }
+}]
+
+const bsServices = ['browserstack'];
+const localServices = ['chromedriver'];
 exports.config = {
+    user: process.env.USER,
+    key: process.env.KEY,
     specs: [
         './specs/**/*.js'
     ],
@@ -7,12 +73,7 @@ exports.config = {
     ],
     automationProtocol: 'webdriver',
     maxInstances: 10,
-    capabilities: [{
-        maxInstances: 5,
-        browserName: 'chrome',
-        pageLoadStrategy: 'eager',
-        acceptInsecureCerts: true
-    }],
+    capabilities: process.env.HUB === 'bs' ? bsCaps : localCaps,
     // Level of logging verbosity: trace | debug | info | warn | error | silent
     logLevel: 'warn',
     bail: 0,
@@ -20,8 +81,8 @@ exports.config = {
     waitforTimeout: 10000,
     connectionRetryTimeout: 120000,
     connectionRetryCount: 3,
-    services: ['chromedriver'],
-
+    // services: process.env.HUB === 'bs' ? bsServices : localServices,
+    services: localServices,
     framework: 'mocha',
     cucumberOpts: {
         scenarioLevelReporter: true,
@@ -58,7 +119,13 @@ exports.config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
-    reporters: ['spec', ['allure', { outputDir: 'allure-results' }]],
+    reporters: ['spec',
+        ['allure', {
+            outputDir: 'allure-results',
+            disableWebdriverStepsReporting: true,
+            // disableWebdriverScreenshotsReporting: true,
+            useCucumberStepReporter: false,
+        }]],
 
 
     // Options to be passed to Mocha.
@@ -110,8 +177,14 @@ exports.config = {
      * @param {Array.<String>} specs        List of spec file paths that are to be run
      * @param {Object}         browser      instance of created browser/device session
      */
-    // before: function (capabilities, specs) {
-    // },
+    before: function (capabilities, specs) {
+
+    },
+    async beforeScenario(world) {
+        addEnvironment('SERVER', 'LOCAL');
+        addEnvironment('LOGGING', 'DISABLE');
+        addEnvironment('HEADLESS', 'FALSE');
+    },
     /**
      * Runs before a WebdriverIO command gets executed.
      * @param {String} commandName hook command name
@@ -142,6 +215,22 @@ exports.config = {
      */
     // afterHook: function (test, context, { error, result, duration, passed, retries }) {
     // },
+
+    afterStep: function (step, scenario, result, context) {
+        // console.log({ step });
+        // console.log({ result });
+        // console.log({ scenario });
+        // console.log({ context });
+        if (step.keyword !== undefined) {
+            const content = {
+                content: '123',
+                name: 'name'
+            };
+            let status = result.passed ? 'passed' : 'failed';
+            addStep(step.keyword.toUpperCase() + step.text, content, status);
+        }
+    },
+
     /**
      * Function to be executed after a test (in Mocha/Jasmine only)
      * @param {Object}  test             test object
@@ -158,8 +247,20 @@ exports.config = {
         }
     },
 
-    afterScenario: async ()=>{
-        await browser.reloadSession();
+    afterScenario: async (world, result, context) => {
+        if (world.result.status === 'SKIPPED') {
+            world.result.status = 'FAILED'
+        }
+        console.log({result})
+        console.log(result.passed)
+        console.log(result.passed)
+        console.log(result.passed)
+        addDescription('TESTTESTTEST!!! <script>alert(123)</script>')
+
+        if (!result.passed) {
+            addDescription('TESTTESTTEST!!!<img src="https://s.keepmeme.com/files/en_posts/20200908/blurred-surprised-cat-meme-5b734a45210ef3b6657bcbe2831715fa.jpg">')
+        }
+        // await browser.reloadSession();
     },
 
     /**
