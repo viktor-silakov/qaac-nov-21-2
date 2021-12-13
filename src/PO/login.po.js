@@ -20,7 +20,7 @@ class Login {
         return this.main.$('button');
     }
 
-    // locators
+    // actions
     async login(credentials) {
         await this.username.setValue(credentials.username);
         await this.password.setValue(credentials.password);
